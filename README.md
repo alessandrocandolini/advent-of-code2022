@@ -1,4 +1,8 @@
+[![CI](https://github.com/alessandrocandolini/advent-of-code2022/actions/workflows/ci.yml/badge.svg)](https://github.com/alessandrocandolini/advent-of-code2022/actions/workflows/ci.yml)
+
 # advent-of-code2022
+
+https://adventofcode.com/2022
 
 ## How to build and run locally
 
