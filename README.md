@@ -1,4 +1,4 @@
-[![CI](https://github.com/alessandrocandolini/advent-of-code2022/actions/workflows/ci.yml/badge.svg)](https://github.com/alessandrocandolini/advent-of-code2022/actions/workflows/ci.yml)
+[![CI](https://github.com/alessandrocandolini/advent-of-code2022/actions/workflows/ci.yml/badge.svg)](https://github.com/alessandrocandolini/advent-of-code2022/actions/workflows/ci.yml) [![codecov](https://codecov.io/gh/alessandrocandolini/advent-of-code2022/branch/main/graph/badge.svg?token=P1OXMBYk3O)](https://codecov.io/gh/alessandrocandolini/advent-of-code2022)
 
 # advent-of-code2022
 
