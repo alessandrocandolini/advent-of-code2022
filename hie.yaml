@@ -1,0 +1,14 @@
+cradle:
+  stack:
+    - path: "./src"
+      component: "advent-of-code2022:lib"
+
+    - path: "./app/Main.hs"
+      component: "advent-of-code2022:exe:advent-of-code2022-exe"
+
+    - path: "./app/Paths_advent-of-code2022.hs"
+      component: "advent-of-code2022:exe:advent-of-code2022-exe"
+
+    - path: "./test"
+      component: "advent-of-code2022:test:advent-of-code2022-test"
+
