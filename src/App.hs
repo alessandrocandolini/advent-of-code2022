@@ -15,7 +15,7 @@ program' _ = putStrLn "day not found"
 
 data Args = Args {
    day :: Int,
-   input :: String
+   input :: FilePath
    } deriving (Eq,Show)
 
 parser :: Parser Args
