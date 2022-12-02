@@ -36,6 +36,10 @@ spec = describe "Simple test" $ do
                Elf 5 [10000]
             ]
      it "calculate result" $
+
+-- parse :: Text -> Maybe (NonEmpty Elf) 
+-- logic :: NonEmpty Elf 
+
         (fmap logic . parse) [trimming| 
           1000
           2000

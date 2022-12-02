@@ -20,7 +20,7 @@ program = longStory
 
 -- unsafe, faster, shorter version
 oneLiner :: FilePath -> IO ()
-oneLiner = undefined
+oneLiner = fmap (fmap unpack . lines) . T.readFile
 
 -- safer, longer version
 longStory :: FilePath -> IO ()
