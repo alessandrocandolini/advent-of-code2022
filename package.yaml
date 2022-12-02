@@ -7,9 +7,12 @@ dependencies:
 - bytestring
 - safe
 - split
+- unliftio
+- ilist  
 - containers
 - nonempty-containers
 - async
+- either
 - mtl
 - optparse-applicative
 - optparse-generic
@@ -18,6 +21,7 @@ dependencies:
 
 default-extensions:
 - OverloadedStrings
+- OverloadedLists
 
 ghc-options:
   - -Wall
