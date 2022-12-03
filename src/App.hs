@@ -1,8 +1,25 @@
 module App where
 import Options.Applicative
+    ( (<**>),
+      Parser,
+      ParserInfo,
+      auto,
+      fullDesc,
+      help,
+      info,
+      long,
+      option,
+      progDesc,
+      short,
+      strOption,
+      execParser,
+      helper )
 
-import Day1
-import Day2
+import Day1 ( program )
+import Day2 ( program )
+import Day3 ( program )
+import Day4 ( program )
+import Day5 ( program )
 
 program :: IO ()
 program = execParser parserInfo >>= program'
@@ -10,6 +27,9 @@ program = execParser parserInfo >>= program'
 program' :: Args -> IO ()
 program' (Args 1 f) = Day1.program f
 program' (Args 2 f) = Day2.program f
+program' (Args 3 f) = Day3.program f
+program' (Args 4 f) = Day4.program f
+program' (Args 5 f) = Day5.program f
 program' _ = putStrLn "day not found"
 
 
