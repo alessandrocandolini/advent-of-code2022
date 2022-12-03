@@ -2,74 +2,56 @@
 module Day1 where
 
 import qualified Data.Text as T
-import Data.Text.IO as T
-import Control.Monad
-import Data.List.NonEmpty
-import Data.Sequence.NonEmpty (sortOn)
-import Prelude hiding (reverse, head)
-import Control.Exception
-import UnliftIO
-import Data.Either.Combinators (maybeToRight)
+import qualified Data.Text.IO as T
+import qualified Data.List.NonEmpty as N
 import Data.List.Split
 import Data.List.Index
 
 program :: FilePath -> IO ()
-program = longStory
+program = (=<<) (T.putStrLn . T.pack)
+                   . fmap (printResultsOrError . pureProgram)
+                   . T.readFile
 
-
-
--- unsafe, faster, shorter version
-oneLiner :: FilePath -> IO ()
-oneLiner = fmap (fmap unpack . lines) . T.readFile
-
--- safer, longer version
-longStory :: FilePath -> IO ()
-longStory = (=<<) printResults . fmap logic . fetchElves
+pureProgram :: T.Text -> Maybe Report
+pureProgram = fmap logic  . parse
 
 newtype ElfName = ElfName Int deriving (Eq,Show)
    deriving (Num) via Int
 
-newtype Calories = Calories Int deriving (Eq,Show, Ord)
-   deriving (Num, Read) via Int
+newtype Calories = Calories Int deriving (Eq,Show)
+   deriving (Num, Ord, Read) via Int
 
-data ParseFail = ParseFail deriving (Eq,Show)
-
-instance Exception ParseFail 
-  
 data Elf = Elf {
    name :: ElfName,
    calories :: [Calories]
    } deriving (Eq,Show)
 
-fetchElves :: FilePath -> IO (NonEmpty Elf)
-fetchElves = fromEitherIO . fmap (maybeToRight ParseFail . parse) . T.readFile 
-
-parse :: T.Text -> Maybe (NonEmpty Elf) 
-parse =  nonEmpty . fmap parseElf . indexed . splitWhen null . fmap T.unpack . T.lines  where 
-
-   parseElf :: (Int, [String]) -> Elf  -- ignore errors 
-   parseElf (i,c) = Elf (ElfName (i +1)) (fmap read c )
-
-
 
 totalCalories :: Elf -> Calories
 totalCalories = sum . calories
 
-logic :: NonEmpty Elf -> Elf
-logic = head . reverse . sortWith totalCalories
+data Report = Report {
+    bestCandidate :: Elf,
+    allCandidates :: [Elf]
+    } deriving (Eq,Show)
 
-printResults :: Elf -> IO ()
-printResults e = (T.putStrLn . T.pack) $ show (name e) ++ "\n" ++ show (totalCalories e)
+parse :: T.Text -> Maybe (N.NonEmpty Elf)
+parse =  N.nonEmpty . fmap parseElf . indexed . splitWhen null . fmap T.unpack . T.lines  where
+   parseElf :: (Int, [String]) -> Elf  -- ignore errors
+   parseElf = Elf <$> (ElfName . (+ 1) . fst) <*> (fmap read . snd)
 
+logic :: N.NonEmpty Elf -> Report
+logic = uncurry Report . ((,) <$> N.head <*> N.take 3)  . N.reverse . N.sortWith totalCalories
 
+allCalories :: [Elf] -> Calories
+allCalories = sum . concatMap calories
 
+printResults :: String -> String -> String -> String
+printResults n t a = "best candidate:\nElf name: " ++ n ++ "\nTotal calories: " ++ t ++ "\nTotal candidates first 3 candidates: " ++ a ++ "\n"
 
+printResultsFromReport :: Report -> String
+printResultsFromReport r = printResults
+    ((show . name . bestCandidate) r) ((show . totalCalories . bestCandidate) r) ((show . allCalories . allCandidates ) r )
 
-
-
-
-
-
-
-
-
+printResultsOrError :: Maybe Report -> String
+printResultsOrError = maybe "Parsing Error" printResultsFromReport

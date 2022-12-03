@@ -28,7 +28,11 @@ which generates a textual and HTML report.
 
 To run the executable,
 ```
-stack exec advent-of-code2022-exe
+stack exec advent-of-code2022-exe -- -d <day> -f <filename> 
+```
+for example
+```
+stack exec advent-of-code2022-exe -- -d 1 -f resources/input1
 ```
 For faster feedback loop,
 ```

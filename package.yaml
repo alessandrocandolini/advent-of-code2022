@@ -8,7 +8,7 @@ dependencies:
 - safe
 - split
 - unliftio
-- ilist  
+- ilist
 - containers
 - nonempty-containers
 - async

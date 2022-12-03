@@ -13,7 +13,7 @@ spec :: Spec
 spec = describe "Simple test" $ do
 
      it "parse elves" $
-        parse [trimming| 
+        parse [trimming|
           1000
           2000
           3000
@@ -37,10 +37,10 @@ spec = describe "Simple test" $ do
             ]
      it "calculate result" $
 
--- parse :: Text -> Maybe (NonEmpty Elf) 
--- logic :: NonEmpty Elf 
+-- parse :: Text -> Maybe (NonEmpty Elf)
+-- logic :: NonEmpty Elf
 
-        (fmap logic . parse) [trimming| 
+        (fmap (bestCandidate . logic ). parse) [trimming|
           1000
           2000
           3000
