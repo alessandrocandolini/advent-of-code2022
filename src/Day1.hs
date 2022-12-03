@@ -1,5 +1,5 @@
 {-# LANGUAGE DerivingVia #-}
-module Day1 where
+module Day1(program, parse, pureProgram, logic, printResultsOrError, Elf(..), ElfName(..), Calories(..), Report(..)) where
 
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
@@ -13,7 +13,6 @@ program = (=<<) T.putStrLn
                    . fmap (printResultsOrError . pureProgram)
                    . T.readFile
 
-pureProgram :: T.Text -> Maybe Report
 pureProgram = fmap logic  . parse
 
 newtype ElfName = ElfName Int
@@ -28,30 +27,23 @@ data Elf = Elf {
    } deriving (Eq,Show)
 
 
-totalCalories :: Elf -> Calories
 totalCalories = sum . calories
 
-data Report = Report {
-    bestCandidate :: Elf,
-    allCandidates :: [Elf]
+newtype Report = Report {
+    candidates :: N.NonEmpty Elf
     } deriving (Eq,Show)
 
-parse :: T.Text -> Maybe (N.NonEmpty Elf)
+bestCandidate = N.head . candidates
+
 parse =  N.nonEmpty . fmap parseElf . indexed . splitWhen T.null . T.lines  where
-   parseElf :: (Int, [T.Text]) -> Elf  -- ignore errors
-   parseElf = Elf <$> (ElfName . (+ 1) . fst) <*> (fmap tread . snd)
-   tread =  either (const 0) (Calories . fst) . decimal
+   parseElf = Elf <$> (ElfName . (+ 1) . fst) <*> (fmap tRead . snd)
+   tRead =  either (const 0) (Calories . fst) . decimal
 
-logic :: N.NonEmpty Elf -> Report
-logic = uncurry Report . ((,) <$> N.head <*> N.take 3)  . N.reverse . N.sortWith totalCalories
+logic = Report . ((N.:|) <$> N.head <*> (take 2 . N.tail))  . N.reverse . N.sortWith totalCalories
 
-allCalories :: [Elf] -> Calories
 allCalories = sum . concatMap calories
 
-printResultsFromReport :: Report -> String
-printResultsFromReport r = printResults
-    ((show . name . bestCandidate) r) ((show . totalCalories . bestCandidate) r) ((show . allCalories . allCandidates ) r ) where
-     printResults n t a = "Winner: " ++ n ++ "\nTotal calories: " ++ t ++ "\nTotal candidates first 3 candidates: " ++ a
+printResultsFromReport = T.pack . (printResults <$> name . bestCandidate <*> totalCalories . bestCandidate <*> allCalories . candidates ) where
+     printResults n t a = "Winner: " ++ show n ++ "\nTotal calories: " ++ show t ++ "\nTotal candidates first 3 candidates: " ++ show a
 
-printResultsOrError :: Maybe Report -> T.Text
-printResultsOrError = maybe "Parsing Error" (T.pack . printResultsFromReport)
+printResultsOrError = maybe "Parsing Error" printResultsFromReport

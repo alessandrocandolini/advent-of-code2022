@@ -53,7 +53,7 @@ spec = describe "Simple test" $ do
           9000
 
           10000
-          |] `shouldBe` Just ( Report (Elf 4 [7000, 8000, 9000]) [(Elf 4 [7000, 8000, 9000]), (Elf 3 [5000, 6000]),(Elf 5 [10000])])
+          |] `shouldBe` Just ( Report [(Elf 4 [7000, 8000, 9000]), (Elf 3 [5000, 6000]),(Elf 5 [10000])])
 
      it "render report" $
 
