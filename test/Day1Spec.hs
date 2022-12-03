@@ -72,11 +72,11 @@ spec = describe "Simple test" $ do
           9000
 
           10000
-          |] `shouldBe` (unpack [trimming|
+          |] `shouldBe` [trimming|
             Winner: 4
             Total calories: 24000
             Total candidates first 3 candidates: 45000
-          |])
+          |]
 
 
      prop "property-based unit test" $

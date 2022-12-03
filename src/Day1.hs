@@ -9,7 +9,7 @@ import Data.List.Index
 import Data.Text.Read (decimal)
 
 program :: FilePath -> IO ()
-program = (=<<) (T.putStrLn . T.pack)
+program = (=<<) T.putStrLn
                    . fmap (printResultsOrError . pureProgram)
                    . T.readFile
 
@@ -48,12 +48,10 @@ logic = uncurry Report . ((,) <$> N.head <*> N.take 3)  . N.reverse . N.sortWith
 allCalories :: [Elf] -> Calories
 allCalories = sum . concatMap calories
 
-printResults :: String -> String -> String -> String
-printResults n t a = "Winner: " ++ n ++ "\nTotal calories: " ++ t ++ "\nTotal candidates first 3 candidates: " ++ a
-
 printResultsFromReport :: Report -> String
 printResultsFromReport r = printResults
-    ((show . name . bestCandidate) r) ((show . totalCalories . bestCandidate) r) ((show . allCalories . allCandidates ) r )
+    ((show . name . bestCandidate) r) ((show . totalCalories . bestCandidate) r) ((show . allCalories . allCandidates ) r ) where
+     printResults n t a = "Winner: " ++ n ++ "\nTotal calories: " ++ t ++ "\nTotal candidates first 3 candidates: " ++ a
 
-printResultsOrError :: Maybe Report -> String
-printResultsOrError = maybe "Parsing Error" printResultsFromReport
+printResultsOrError :: Maybe Report -> T.Text
+printResultsOrError = maybe "Parsing Error" (T.pack . printResultsFromReport)
