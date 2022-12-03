@@ -47,4 +47,4 @@ spec = describe "Day2: Play rock-paper-scissors" $ do
         A Y
         B X
         C Z
-        |] `shouldBe` 15
+        |] `shouldBe` (Report 15 12)
