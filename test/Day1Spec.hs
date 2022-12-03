@@ -78,7 +78,3 @@ spec = describe "Simple test" $ do
             Total candidates first 3 candidates: 45000
           |]
 
-
-     prop "property-based unit test" $
-        \l -> reverse ( reverse l ) == ( l::[Int])
-
