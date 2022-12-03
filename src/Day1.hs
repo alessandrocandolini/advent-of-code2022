@@ -15,11 +15,11 @@ program = (=<<) (T.putStrLn . T.pack)
 pureProgram :: T.Text -> Maybe Report
 pureProgram = fmap logic  . parse
 
-newtype ElfName = ElfName Int deriving (Eq,Show)
-   deriving (Num) via Int
+newtype ElfName = ElfName Int
+   deriving (Eq, Num,Show) via Int
 
-newtype Calories = Calories Int deriving (Eq,Show)
-   deriving (Num, Ord, Read) via Int
+newtype Calories = Calories Int
+   deriving (Eq, Num, Ord, Read, Show) via Int
 
 data Elf = Elf {
    name :: ElfName,
@@ -47,7 +47,7 @@ allCalories :: [Elf] -> Calories
 allCalories = sum . concatMap calories
 
 printResults :: String -> String -> String -> String
-printResults n t a = "best candidate:\nElf name: " ++ n ++ "\nTotal calories: " ++ t ++ "\nTotal candidates first 3 candidates: " ++ a ++ "\n"
+printResults n t a = "Winner: " ++ n ++ "\nTotal calories: " ++ t ++ "\nTotal candidates first 3 candidates: " ++ a
 
 printResultsFromReport :: Report -> String
 printResultsFromReport r = printResults
