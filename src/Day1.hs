@@ -6,6 +6,7 @@ import qualified Data.Text.IO as T
 import qualified Data.List.NonEmpty as N
 import Data.List.Split
 import Data.List.Index
+import Data.Text.Read (decimal)
 
 program :: FilePath -> IO ()
 program = (=<<) (T.putStrLn . T.pack)
@@ -36,9 +37,10 @@ data Report = Report {
     } deriving (Eq,Show)
 
 parse :: T.Text -> Maybe (N.NonEmpty Elf)
-parse =  N.nonEmpty . fmap parseElf . indexed . splitWhen null . fmap T.unpack . T.lines  where
-   parseElf :: (Int, [String]) -> Elf  -- ignore errors
-   parseElf = Elf <$> (ElfName . (+ 1) . fst) <*> (fmap read . snd)
+parse =  N.nonEmpty . fmap parseElf . indexed . splitWhen T.null . T.lines  where
+   parseElf :: (Int, [T.Text]) -> Elf  -- ignore errors
+   parseElf = Elf <$> (ElfName . (+ 1) . fst) <*> (fmap tread . snd)
+   tread =  either (const 0) (Calories . fst) . decimal
 
 logic :: N.NonEmpty Elf -> Report
 logic = uncurry Report . ((,) <$> N.head <*> N.take 3)  . N.reverse . N.sortWith totalCalories
