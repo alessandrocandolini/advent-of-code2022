@@ -1,45 +1,50 @@
+{-# LANGUAGE QuasiQuotes #-}
 module Day2Spec where
 
 import Day2
 import Test.Hspec
 import Test.Hspec.QuickCheck
-import Test.QuickCheck.Property
 import Test.QuickCheck.Arbitrary
-
+import Test.QuickCheck.Property
+import NeatInterpolation
 
 instance Arbitrary Move where
-   arbitrary = arbitraryBoundedEnum
-
+  arbitrary = arbitraryBoundedEnum
 
 spec :: Spec
 spec = describe "Day2: Play rock-paper-scissors" $ do
+  it "paper wins over rock" $
+    play (Match Rock Paper) `shouldBe` Winner Player2
 
-     it "paper wins over rock" $
-        winner (Match Rock Paper) `shouldBe` Player2
+  it "rock wins over scissors" $
+    play (Match Rock Scissors) `shouldBe` Winner Player1
 
-     it "rock wins over scissors" $
-        winner (Match Rock Scissors) `shouldBe` Player1
+  it "rock rock is a draw" $
+    play (Match Rock Rock) `shouldBe` NoWinner
 
-     it "rock rock is a draw" $
-        winner (Match Rock Rock) `shouldBe` Draw
+  it "scissors win over paper " $
+    play (Match Scissors Paper) `shouldBe` Winner Player1
 
-     it "scissors win over paper " $
-        winner (Match Scissors Paper) `shouldBe` Player1
+  prop "always result in draw if the moves are the same for all players" $
+    \m -> play (Match m m) == NoWinner
 
-     prop "always result in draw if the moves are the same for all players" $
-        \m -> winner (Match m m) == Draw
+  prop "never result in draw if the moves are not the same for the two players" $
+    \m1 m2 -> m1 /= m2 ==> play (Match m1 m2) /= NoWinner
 
-     prop "never result in draw if the moves are not the same for the two players" $
-        \m1 m2  -> m1 /= m2 ==> winner (Match m1 m2) /= Draw
-     
-     prop "winner is commutative" $
-        \m1 m2  -> m1 /= m2 ==> (
-          (winner (Match m1 m2) == Player1  && 
-          winner (Match m2 m1) == Player2)  || 
-           (winner (Match m1 m2) == Player2  && 
-            winner (Match m2 m1) == Player1))
+  prop "play is symmetric" $
+    \m1 m2 ->
+      m1 /= m2
+        ==> ( ( play (Match m1 m2) == Winner Player1
+                  && play (Match m2 m1) == Winner Player2
+              )
+                || ( play (Match m1 m2) == Winner Player2
+                       && play (Match m2 m1) == Winner Player1
+                   )
+            )
 
-
-     prop "property-based unit test" $
-        \l -> reverse ( reverse l ) == ( l::[Int])
-
+  it "example" $
+     pureProgram [trimming|
+        A Y
+        B X
+        C Z
+        |] `shouldBe` 15

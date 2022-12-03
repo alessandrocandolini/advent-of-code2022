@@ -33,6 +33,7 @@ stack exec advent-of-code2022-exe -- -d <day> -f <filename>
 for example
 ```
 stack exec advent-of-code2022-exe -- -d 1 -f resources/input1
+stack exec advent-of-code2022-exe -- -d 2 -f resources/input2
 ```
 For faster feedback loop,
 ```

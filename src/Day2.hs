@@ -1,48 +1,102 @@
 {-# LANGUAGE DerivingVia #-}
-module Day2 where
 
-program :: String -> IO ()
-program _ = pure ()
+module Day2 (program, pureProgram, score, play, Player (..), Move (..), Score (..), Match (..), Winner (..)) where
+import qualified Data.Text as T
+import qualified Data.Text.IO as T
+import Data.Maybe (mapMaybe)
 
-data Move = Rock | Paper | Scissors deriving (Eq,Show, Bounded, Enum)
+program :: FilePath -> IO ()
+program = (=<<) print  . fmap pureProgram . T.readFile
 
-newtype Score = Score Int deriving (Eq, Show, Num, Ord) via Int 
+pureProgram :: T.Text -> Score
+pureProgram = scores Player2 . parseMatches
 
-data Match = Match Move Move deriving (Eq,Show)
+data Move = Rock | Paper | Scissors deriving (Eq, Show, Bounded, Enum)
 
-data Winner = Player1 | Player2 | Draw deriving (Eq,Show)
+data Match = Match
+  { movePlayer1 :: Move,
+    movePlayer2 :: Move
+  }
+  deriving (Eq, Show)
 
-data Scores = Scores {
-   score1 :: Score, 
-   score2 :: Score 
-   } deriving (Eq,Show)
+data Player = Player1 | Player2 deriving (Eq, Show, Enum, Bounded)
 
-score :: Move -> Score 
-score = (+ 1) . fromIntegral . fromEnum
+newtype Score = Score Int deriving (Eq, Show, Num, Ord) via Int
+
+instance Semigroup Score  where
+   (<>) = (+)
+
+instance Monoid Score where
+   mempty = 0
+
+data Winner = Winner Player | NoWinner deriving (Eq, Show)
+
+data Outcome = Lose | Draw | Win deriving (Show, Eq, Enum, Bounded)
+
+cyclicSucc :: (Eq a, Enum a, Bounded a) => a -> a
+cyclicSucc a
+  | a == maxBound = minBound
+  | otherwise = succ a
+
+scoreMove :: Move -> Score
+scoreMove = (+ 1) . fromIntegral . fromEnum
+
 --score Rock = 1
 --score Paper = 2
 --score Scissors = 3
 
---winnerScore :: Winner -> Score
---scoreOutcome = (* 3) . fromEnum
---scoreOutcome Loss = 0 
+scoreOutcome :: Outcome -> Score
+scoreOutcome = (* 3) . fromIntegral . fromEnum
+
+--scoreOutcome Loss = 0
 --scoreOutcome Draw = 3
 --scoreOutcome Win = 6
 
-parsePlayer1 :: Char -> Maybe Move
-parsePlayer1 'A' = Just Rock 
-parsePlayer1 'B' = Just Paper
-parsePlayer1 'C' = Just Scissors 
-parsePlayer1 _ = Nothing 
+--newtype Parser a = Parser {
+  --unparse :: StateT String Maybe a
+  --} deriving (Functor, Applicative, Alternative, Monad, MonadPlus)
 
-parsePlayer2 :: Char -> Maybe Move
-parsePlayer2 'X' = Just Rock 
-parsePlayer2 'Y' = Just Paper
-parsePlayer2 'Z' = Just Scissors 
-parsePlayer2 _ = Nothing 
 
-winner :: Match -> Winner 
-winner (Match m1 m2) | m2 == m1 = Draw
-                     | m2 == succ m1 = Player2
-                     | otherwise = Player1
+parse1 :: Char -> Maybe Move
+parse1 'A' = Just Rock
+parse1 'B' = Just Paper
+parse1 'C' = Just Scissors
+parse1 _ = Nothing
 
+parse2 :: Char -> Maybe Move
+parse2 'X' = Just Rock
+parse2 'Y' = Just Paper
+parse2 'Z' = Just Scissors
+parse2 _ = Nothing
+
+parseMatch :: T.Text -> Maybe Match
+parseMatch = parseThree  . T.unpack where
+   parseThree (a : ' ' :  b : [])  = Match <$> parse1 a <*> parse2 b
+   parseThree _ = Nothing
+
+parseMatches :: T.Text -> [Match]
+parseMatches = mapMaybe parseMatch . T.lines
+
+move :: Player -> Match -> Move
+move Player1 = movePlayer1
+move Player2 = movePlayer2
+
+play :: Match -> Winner
+play (Match m1 m2)
+  | m2 == m1 = NoWinner
+  | m2 == cyclicSucc m1 = Winner Player2
+  | otherwise = Winner Player1
+
+outcome :: Player -> Match -> Outcome
+outcome p = checkWinner . play
+  where
+    checkWinner NoWinner = Draw
+    checkWinner (Winner p')
+      | p' == p = Win
+      | otherwise = Lose
+
+score :: Player -> Match -> Score
+score p = (+) <$> scoreOutcome . outcome p <*> scoreMove . move p
+
+scores :: Player -> [Match] -> Score
+scores p = foldMap (score p)
