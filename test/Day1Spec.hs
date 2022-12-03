@@ -37,10 +37,7 @@ spec = describe "Simple test" $ do
             ]
      it "calculate result" $
 
--- parse :: Text -> Maybe (NonEmpty Elf)
--- logic :: NonEmpty Elf
-
-        (fmap (bestCandidate . logic ). parse) [trimming|
+        pureProgram [trimming|
           1000
           2000
           3000
@@ -55,7 +52,7 @@ spec = describe "Simple test" $ do
           9000
 
           10000
-          |] `shouldBe` Just (Elf 4 [7000, 8000, 9000])
+          |] `shouldBe` Just ( Report (Elf 4 [7000, 8000, 9000]) [(Elf 4 [7000, 8000, 9000]), (Elf 3 [5000, 6000]),(Elf 5 [10000])])
 
      prop "property-based unit test" $
         \l -> reverse ( reverse l ) == ( l::[Int])
