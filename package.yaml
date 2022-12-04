@@ -21,7 +21,6 @@ dependencies:
 
 default-extensions:
 - OverloadedStrings
-- OverloadedLists
 
 ghc-options:
   - -Wall

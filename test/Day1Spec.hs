@@ -1,3 +1,4 @@
+{-# LANGUAGE OverloadedLists #-}
 {-# LANGUAGE QuasiQuotes #-}
 module Day1Spec where
 
