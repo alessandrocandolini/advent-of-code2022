@@ -56,31 +56,54 @@ spec = describe "Day4" $ do
     pureProgram input `shouldBe` (Report 2 4)
 
   it "overlap single selection" $
-    checkOverlap (Range 5 7) (Range 7 9) `shouldBe` Partially
+    checkOverlap (Range 5 7) (Range 7 9) `shouldBe` Partial
 
   it "do not ovelap" $
-    checkOverlap (Range 2 4) (Range 6 8) `shouldBe` No
+    checkOverlap (Range 2 4) (Range 6 8) `shouldBe` NoOverlap
 
   it "do not ovelap" $
-    checkOverlap (Range 2 3) (Range 4 5) `shouldBe` No
+    checkOverlap (Range 2 3) (Range 4 5) `shouldBe` NoOverlap
 
   it "full overlap (edge)" $
-    checkOverlap (Range 2 3) (Range 2 5) `shouldBe` Fully
+    checkOverlap (Range 2 3) (Range 2 5) `shouldBe` Full
 
   it "full overlap (internal)" $
-    checkOverlap (Range 2 5) (Range 3 4) `shouldBe` Fully
+    checkOverlap (Range 2 5) (Range 3 4) `shouldBe` Full
+
+  it "parse successful lines" $
+    parse input `shouldBe` [
+         Round (Range 2 4) (Range 6 8),
+         Round (Range 2 3) (Range 4 5),
+         Round (Range 5 7) (Range 7 9),
+         Round (Range 2 8) (Range 3 7),
+         Round (Range 6 6) (Range 4 6),
+         Round (Range 2 6) (Range 4 8)
+    ]
+
+  it "fail to parse lines with no ranges" $
+     parse "2-3 4-5" `shouldBe` []
+
+  it "parse lines with comma and unexpected spaces" $
+     parse "2-3, 4-5" `shouldBe` [Round (Range 2 3 ) (Range 4 5)]
+
+  it "fail to parse lines with invalid range" $
+     parse "23,4-5" `shouldBe` []
+
+  it "fail to parse lines non-numeric ranges" $
+     parse "2-x,4-5" `shouldBe` []
+
 
   prop "every range overlaps with itself fully" $
-    \r -> checkOverlap r r == Fully
+    \r -> checkOverlap r r == Full
 
   prop "for every pair of ranhges, checkOverlap commutes" $
     \r1 r2 -> checkOverlap r1 r2 == checkOverlap r2 r1
 
   prop "given for different points a < b < c < d, [a,b] and [c,d] are always disjoin" $
     forAll generateNonOverlapping $ \ (r1,r2) ->
-              checkOverlap r1 r2  == No
+              checkOverlap r1 r2  == NoOverlap
 
   prop "given for different points a < b < c < d, [a,c] and [b,d] are partially overlapping" $
     forAll generatePartiallyOverlapping $ \ (r1,r2) ->
-              checkOverlap r1 r2  == Partially
+              checkOverlap r1 r2  == Partial
 
