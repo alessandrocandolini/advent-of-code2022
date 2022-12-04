@@ -1,9 +1,11 @@
+{-# LANGUAGE QuasiQuotes #-}
 module Day4Spec where
 
-import DayN
+import Day4
 import Test.Hspec
 import Test.Hspec.QuickCheck
 import Test.QuickCheck.Property
+import NeatInterpolation
 
 spec :: Spec
 spec = describe "Simple test" $ do
