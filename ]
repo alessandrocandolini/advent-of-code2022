@@ -67,9 +67,6 @@ spec = describe "Day4" $ do
   it "full overlap (edge)" $
     checkOverlap (Range 2 3) (Range 2 5) `shouldBe` Fully
 
-  it "full overlap (internal)" $
-    checkOverlap (Range 2 5) (Range 3 4) `shouldBe` Fully
-
   prop "every range overlaps with itself fully" $
     \r -> checkOverlap r r == Fully
 

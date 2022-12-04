@@ -9,11 +9,7 @@ import qualified Data.Text.IO as T
 program :: FilePath -> IO ()
 program = (=<<) print . fmap pureProgram . T.readFile
 
-data Report = Report
-  { part1 :: Int,
-    part2 :: Int
-  }
-  deriving (Eq, Show)
+data Report = Report Int Int deriving (Eq, Show)
 
 pureProgram :: T.Text -> Report
 pureProgram = uncurry Report . ((,) <$> p1 <*> p2) . fmap overlap . parse
@@ -37,16 +33,12 @@ data Round = Round
   }
   deriving (Eq, Show)
 
-data Range = Range
-  { start :: Int,
-    end :: Int
-  }
-  deriving (Eq, Show)
+data Range = Range Int Int deriving (Eq, Show)
 
 parseRange :: String -> Maybe Range
 parseRange = toRange . fmap read . splitOn "-"
   where
-    toRange (s : e : []) = Just (Range s e)
+    toRange [s, e] = Just (Range s e)
     toRange _ = Nothing
 
 data Overlap = Fully | Partially | No deriving (Eq, Show)
