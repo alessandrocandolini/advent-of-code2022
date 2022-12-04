@@ -8,9 +8,15 @@ import Test.QuickCheck.Property
 import NeatInterpolation
 
 spec :: Spec
-spec = describe "Simple test" $ do
+spec = describe "Day4" $ do
 
-     it "example-based unit test" $
+     it "" $
+        1 `shouldBe` 1
+
+     it "" $
+        1 `shouldBe` 1
+
+     it "" $
         1 `shouldBe` 1
 
      prop "property-based unit test" $
