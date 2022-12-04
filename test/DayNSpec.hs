@@ -1,16 +1,23 @@
+{-# LANGUAGE QuasiQuotes #-}
 module DayNSpec where
 
 import DayN
 import Test.Hspec
 import Test.Hspec.QuickCheck
 import Test.QuickCheck.Property
+import NeatInterpolation
+
+input =
+  [trimming|
+          |]
+
 
 spec :: Spec
-spec = describe "Simple test" $ do
+spec = describe "Day N" $ do
 
-     it "example-based unit test" $
+     it "" $
         1 `shouldBe` 1
 
-     prop "property-based unit test" $
+     prop "" $
         \l -> reverse ( reverse l ) == ( l::[Int])
 

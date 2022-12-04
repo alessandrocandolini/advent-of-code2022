@@ -20,6 +20,7 @@ import Day2 ( program )
 import Day3 ( program )
 import Day4 ( program )
 import Day5 ( program )
+import Day6 ( program )
 
 program :: IO ()
 program = execParser parserInfo >>= program'
@@ -30,6 +31,7 @@ program' (Args 2 f) = Day2.program f
 program' (Args 3 f) = Day3.program f
 program' (Args 4 f) = Day4.program f
 program' (Args 5 f) = Day5.program f
+program' (Args 6 f) = Day6.program f
 program' _ = putStrLn "day not found"
 
 
