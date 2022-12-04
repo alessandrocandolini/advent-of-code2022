@@ -8,8 +8,9 @@ https://adventofcode.com/2022
 - Day 1: [problem](https://adventofcode.com/2022/day/1) | [solution](src/Day1.hs) | [test](test/Day1Spec.hs) 
 - Day 2: [problem](https://adventofcode.com/2022/day/2) | [solution](src/Day2.hs) | [test](test/Day2Spec.hs) 
 - Day 3: [problem](https://adventofcode.com/2022/day/3) | [solution](src/Day3.hs) | [test](test/Day3Spec.hs)
-- Day 4: [problem](https://adventofcode.com/2022/day/4) | [solution](src/Day4.hs) | [test](test/Day4Spec.hs) NOT DONE YET
-- Day 5: TODO
+- Day 4: [problem](https://adventofcode.com/2022/day/4) | [solution](src/Day4.hs) | [test](test/Day4Spec.hs) 
+- Day 5: [problem](https://adventofcode.com/2022/day/5) | [solution](src/Day5.hs) | [test](test/Day5Spec.hs) NOT READY YET
+- Day 6: TODO
 
 ## How to build and run locally
 
@@ -43,6 +44,7 @@ stack exec advent-of-code2022-exe -- -d 1 -f resources/input1
 stack exec advent-of-code2022-exe -- -d 2 -f resources/input2
 stack exec advent-of-code2022-exe -- -d 3 -f resources/input3
 stack exec advent-of-code2022-exe -- -d 4 -f resources/input4
+stack exec advent-of-code2022-exe -- -d 5 -f resources/input5
 ```
 For faster feedback loop,
 ```
