@@ -18,6 +18,7 @@ dependencies:
 - optparse-generic
 - aeson
 - generic-aeson
+- vector
 
 default-extensions:
 - OverloadedStrings
