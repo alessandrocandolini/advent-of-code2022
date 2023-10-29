@@ -5,20 +5,20 @@ dependencies:
 - base >= 4.7 && < 5
 - text
 - bytestring
-- safe
-- split
-- unliftio
-- ilist
 - containers
 - nonempty-containers
+- ilist
+- vector
+- split
+- safe
 - async
 - either
 - mtl
 - optparse-applicative
 - optparse-generic
-- aeson
-- generic-aeson
-- vector
+- witherable
+- MemoTrie
+- neat-interpolation
 
 default-extensions:
 - OverloadedStrings
@@ -57,7 +57,6 @@ tests:
     - hspec
     - hspec-discover
     - QuickCheck
-    - neat-interpolation
 
 
 verbatim:
