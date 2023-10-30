@@ -14,37 +14,37 @@ instance Arbitrary Move where
 spec :: Spec
 spec = describe "Day2: Play rock-paper-scissors" $ do
   it "paper wins over rock" $
-    play (Match Rock Paper) `shouldBe` Winner Player2
+    winner (Round Rock Paper) `shouldBe` Just Player2
 
   it "rock wins over scissors" $
-    play (Match Rock Scissors) `shouldBe` Winner Player1
+    winner (Round Rock Scissors) `shouldBe` Just Player1
 
   it "rock rock is a draw" $
-    play (Match Rock Rock) `shouldBe` NoWinner
+    winner (Round Rock Rock) `shouldBe` Nothing
 
   it "scissors win over paper " $
-    play (Match Scissors Paper) `shouldBe` Winner Player1
+    winner (Round Scissors Paper) `shouldBe` Just Player1
 
   prop "always result in draw if the moves are the same for all players" $
-    \m -> play (Match m m) == NoWinner
+    \m -> winner (Round m m) == Nothing
 
   prop "never result in draw if the moves are not the same for the two players" $
-    \m1 m2 -> m1 /= m2 ==> play (Match m1 m2) /= NoWinner
+    \m1 m2 -> m1 /= m2 ==> winner (Round m1 m2) /= Nothing
 
-  prop "play is symmetric" $
+  prop "winner is symmetric" $
     \m1 m2 ->
       m1 /= m2
-        ==> ( ( play (Match m1 m2) == Winner Player1
-                  && play (Match m2 m1) == Winner Player2
+        ==> ( ( winner (Round m1 m2) == Just Player1
+                  && winner (Round m2 m1) == Just Player2
               )
-                || ( play (Match m1 m2) == Winner Player2
-                       && play (Match m2 m1) == Winner Player1
+                || ( winner (Round m1 m2) == Just Player2
+                       && winner (Round m2 m1) == Just Player1
                    )
             )
 
   it "example" $
-     pureProgram [trimming|
+     logic [trimming|
         A Y
         B X
         C Z
-        |] `shouldBe` (Report 15 12)
+        |] `shouldBe` (Answer 15 12)

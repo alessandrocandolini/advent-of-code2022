@@ -1,74 +1,72 @@
 {-# LANGUAGE DerivingVia #-}
 
-module Day2 (program, pureProgram, score, play, Player (..), Move (..), Score (..), Match (..), Winner (..), Report (..)) where
+module Day2 (program, logic, score, winner, Player (..), Move (..), Score (..), Round (..), Answer (..)) where
 
 import Data.Maybe (mapMaybe)
+import Data.Semigroup
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
 
-program :: FilePath -> IO ()
-program = (=<<) print . fmap pureProgram . T.readFile
+data Answer = Answer
+  { part1 :: Score
+  , part2 :: Score
+  }
+  deriving (Eq, Show)
 
-pureProgram :: T.Text -> Report
-pureProgram =
-  Report <$> scores Player2 . parseMatches
-    <*> scores Player2 . fmap (uncurry generateMatch) . parseMoveAndStrategies
+program :: FilePath -> IO ()
+program = (=<<) print . fmap logic . T.readFile
+
+logic :: T.Text -> Answer
+logic =
+  Answer
+    <$> totalScore Player2
+    . parseRounds
+    <*> totalScore Player2
+    . fmap (uncurry roundFromOutcome)
+    . parseMoveAndDesiredOutcomes
 
 data Move = Rock | Paper | Scissors deriving (Eq, Show, Bounded, Enum)
 
-data Match = Match
-  { movePlayer1 :: Move,
-    movePlayer2 :: Move
+data Player = Player1 | Player2 deriving (Eq, Show)
+
+data Round = Round
+  { movePlayer1 :: Move
+  , movePlayer2 :: Move
   }
   deriving (Eq, Show)
-
-data Player = Player1 | Player2 deriving (Eq, Show, Enum, Bounded)
-
-newtype Score = Score Int deriving (Eq, Show, Num, Ord) via Int
-
-instance Semigroup Score where
-  (<>) = (+)
-
-instance Monoid Score where
-  mempty = 0
-
-data Winner = Winner Player | NoWinner deriving (Eq, Show)
 
 data Outcome = Lose | Draw | Win deriving (Show, Eq, Enum, Bounded)
 
-data Report = Report
-  { part1 :: Score,
-    part2 :: Score
-  }
-  deriving (Eq, Show)
+newtype Score = Score Int
+  deriving (Eq, Show, Num, Ord) via Int
+  deriving (Semigroup, Monoid) via (Sum Int)
 
-cyclicSucc :: (Eq a, Enum a, Bounded a) => a -> a
-cyclicSucc a
+next :: (Eq a, Enum a, Bounded a) => a -> a
+next a
   | a == maxBound = minBound
   | otherwise = succ a
 
-cyclicPred :: (Eq a, Enum a, Bounded a) => a -> a
-cyclicPred a
+previous :: (Eq a, Enum a, Bounded a) => a -> a
+previous a
   | a == minBound = maxBound
   | otherwise = pred a
 
-scoreMove :: Move -> Score
-scoreMove = (+ 1) . fromIntegral . fromEnum
+numFromEnum :: (Enum a, Num b) => a -> b
+numFromEnum = fromIntegral . fromEnum
 
---score Rock = 1
---score Paper = 2
---score Scissors = 3
+scoreForMove :: Move -> Score
+scoreForMove = (+ 1) . numFromEnum
 
-scoreOutcome :: Outcome -> Score
-scoreOutcome = (* 3) . fromIntegral . fromEnum
+-- score Rock = 1
+-- score Paper = 2
+-- score Scissors = 3
 
---scoreOutcome Loss = 0
---scoreOutcome Draw = 3
---scoreOutcome Win = 6
+scoreForOutcome :: Outcome -> Score
+scoreForOutcome = (* 3) . numFromEnum
 
---newtype Parser a = Parser {
---unparse :: StateT String Maybe a
---} deriving (Functor, Applicative, Alternative, Monad, MonadPlus)
+-- scoreOutcome Loss = 0
+-- scoreOutcome Draw = 3
+-- scoreOutcome Win = 6
 
 parse1 :: Char -> Maybe Move
 parse1 'A' = Just Rock
@@ -82,58 +80,60 @@ parse2 'Y' = Just Paper
 parse2 'Z' = Just Scissors
 parse2 _ = Nothing
 
-parseMatch :: T.Text -> Maybe Match
-parseMatch = parseThree . T.unpack
-  where
-    parseThree (a : ' ' : b : []) = Match <$> parse1 a <*> parse2 b
-    parseThree _ = Nothing
+parseRound :: T.Text -> Maybe Round
+parseRound = parseLine . T.unpack
+ where
+  parseLine [a, ' ', b] = Round <$> parse1 a <*> parse2 b
+  parseLine _ = Nothing
 
-parseMatches :: T.Text -> [Match]
-parseMatches = mapMaybe parseMatch . T.lines
+parseRounds :: T.Text -> [Round]
+parseRounds = mapMaybe parseRound . T.lines
 
-parseStrategy :: Char -> Maybe Outcome
-parseStrategy 'X' = Just Lose
-parseStrategy 'Y' = Just Draw
-parseStrategy 'Z' = Just Win
-parseStrategy _ = Nothing
-
-parseMoveAndStrategy :: T.Text -> Maybe (Move, Outcome)
-parseMoveAndStrategy = parseThree . T.unpack
-  where
-    parseThree (a : ' ' : b : []) = (,) <$> parse1 a <*> parseStrategy b
-    parseThree _ = Nothing
-
-parseMoveAndStrategies :: T.Text -> [(Move, Outcome)]
-parseMoveAndStrategies = mapMaybe parseMoveAndStrategy . T.lines
-
-moveForStrategy :: Outcome -> Move -> Move
-moveForStrategy Lose = cyclicPred
-moveForStrategy Draw = id
-moveForStrategy Win = cyclicSucc
-
-generateMatch :: Move -> Outcome -> Match
-generateMatch m o = Match m (moveForStrategy o m)
-
-move :: Player -> Match -> Move
+move :: Player -> Round -> Move
 move Player1 = movePlayer1
 move Player2 = movePlayer2
 
-play :: Match -> Winner
-play (Match m1 m2)
-  | m2 == m1 = NoWinner
-  | m2 == cyclicSucc m1 = Winner Player2
-  | otherwise = Winner Player1
+winner :: Round -> Maybe Player
+winner (Round m1 m2)
+  | m1 == m2 = Nothing
+  | m2 == next m1 = Just Player2
+  | otherwise = Just Player1
 
-outcome :: Player -> Match -> Outcome
-outcome p = checkWinner . play
-  where
-    checkWinner NoWinner = Draw
-    checkWinner (Winner p')
-      | p' == p = Win
-      | otherwise = Lose
+outcome :: Player -> Round -> Outcome
+outcome p = checkWinner . winner
+ where
+  checkWinner Nothing = Draw
+  checkWinner (Just p')
+    | p' == p = Win
+    | otherwise = Lose
 
-score :: Player -> Match -> Score
-score p = (+) <$> scoreOutcome . outcome p <*> scoreMove . move p
+score :: Player -> Round -> Score
+score p = (<>) <$> scoreForOutcome . outcome p <*> scoreForMove . move p
 
-scores :: Player -> [Match] -> Score
-scores p = foldMap (score p)
+totalScore :: Player -> [Round] -> Score
+totalScore p = foldMap (score p)
+
+-- part 2
+
+parseDesiredOutcome :: Char -> Maybe Outcome
+parseDesiredOutcome 'X' = Just Lose
+parseDesiredOutcome 'Y' = Just Draw
+parseDesiredOutcome 'Z' = Just Win
+parseDesiredOutcome _ = Nothing
+
+parseMoveAndDesiredOutcome :: T.Text -> Maybe (Move, Outcome)
+parseMoveAndDesiredOutcome = parseLine . T.unpack
+ where
+  parseLine [a, ' ', b] = (,) <$> parse1 a <*> parseDesiredOutcome b
+  parseLine _ = Nothing
+
+parseMoveAndDesiredOutcomes :: T.Text -> [(Move, Outcome)]
+parseMoveAndDesiredOutcomes = mapMaybe parseMoveAndDesiredOutcome . T.lines
+
+moveFromOutcome :: Outcome -> Move -> Move
+moveFromOutcome Lose = previous
+moveFromOutcome Draw = id
+moveFromOutcome Win = next
+
+roundFromOutcome :: Move -> Outcome -> Round
+roundFromOutcome m o = Round m (moveFromOutcome o m)
