@@ -16,6 +16,7 @@ import Data.List (unfoldr, transpose)
 import Data.Semigroup
 import qualified Data.Text as T
 import Data.List.Split (splitOn)
+import Text.Megaparsec (parse)
 
 input =
   [trimming|
@@ -155,12 +156,32 @@ spec = describe "Day 5" $ do
         in
           parseInstruction s `shouldBe` Just (Instruction a' b' c')
 
+     it "parse crate" $ let
+          s = [text|[C]|]
+         in
+          parse crateP "" s `shouldBe` Right (Crate 'C')
+
+     it "parse optional crates when they are all defined" $ let
+          s = [text|[C] [D] [E] [F]|]
+         in
+          parse cratesP "" s `shouldBe` Right [Just (Crate 'C'), Just (Crate 'D'), Just (Crate 'E'), Just (Crate 'F')]
+
+     it "parse optional crates when they are not all defined" $ let
+          s = [text|[C] [D]     [E]     [F] |]
+         in
+          parse cratesP "" s `shouldBe` Right [Just (Crate 'C'), Just (Crate 'D'), Nothing, Just (Crate 'E'), Nothing, Just (Crate 'F')]
+
+     it "parse optional crates when they are not all defined, starting and ending with undefined" $ let
+          s = T.pack "    [C] [D] [E]     [F]    "
+         in
+          parse cratesP "" s `shouldBe` Right [Nothing, Just (Crate 'C'), Just (Crate 'D'), Just (Crate 'E'), Nothing, Just (Crate 'F'), Nothing]
+
      it "parse crates" $
       let
          s :: T.Text
          s = [text|     [D]     \n [N] [C]     \n [Z] [M] [P] |]
       in
-         parseCrates s `shouldBe` Just [[Nothing, Just (Crate 'D'), Nothing],
+         parse allCratesP "" s `shouldBe` Right [[Nothing, Just (Crate 'D'), Nothing],
                 [Just (Crate 'N'), Just (Crate 'C'), Nothing],
                 [Just (Crate 'Z'), Just (Crate 'M'), Just (Crate 'P')]]
 
