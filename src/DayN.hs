@@ -3,9 +3,9 @@ import qualified Data.Text as T
 import qualified Data.Text.IO as T
 
 program :: FilePath -> IO ()
-program = (=<<) print . fmap pureProgram . T.readFile
+program = (=<<) print . fmap logic . T.readFile
 
-data Report = Report deriving (Eq, Show)
+data Answer = Answer deriving (Eq, Show)
 
-pureProgram :: T.Text -> Report
-pureProgram = const Report
+logic :: T.Text -> Answer
+logic = const Answer
