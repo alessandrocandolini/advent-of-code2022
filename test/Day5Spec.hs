@@ -176,14 +176,22 @@ spec = describe "Day 5" $ do
          in
           parse cratesP "" s `shouldBe` Right [Nothing, Just (Crate 'C'), Just (Crate 'D'), Just (Crate 'E'), Nothing, Just (Crate 'F'), Nothing]
 
-     it "parse crates" $
+     it "parse all crates" $
       let
-         s :: T.Text
-         s = [text|     [D]     \n [N] [C]     \n [Z] [M] [P] |]
-      in
-         parse allCratesP "" s `shouldBe` Right [[Nothing, Just (Crate 'D'), Nothing],
+          s1 = T.pack "    [D]    \n [N] [C]     [Z] [M] [P]"
+          s2 = T.pack "    [D]     [N] [C]     [Z] [M] [P]"
+          expected1 :: [[Maybe Crate]]
+          expected1 = [[Nothing, Just (Crate 'D'), Nothing],
                 [Just (Crate 'N'), Just (Crate 'C'), Nothing],
                 [Just (Crate 'Z'), Just (Crate 'M'), Just (Crate 'P')]]
+          expected2 :: [Maybe Crate]
+          expected2 = [Nothing, Just (Crate 'D'), Nothing,
+                Just (Crate 'N'), Just (Crate 'C'), Nothing,
+                Just (Crate 'Z'), Just (Crate 'M'), Just (Crate 'P')]
+
+      in
+         -- parse cratesP "" s2 `shouldBe` Right expected2
+         parse allCratesP "" s1 `shouldBe` Right expected1
 
      it "parse example input" $
         let
