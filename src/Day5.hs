@@ -114,7 +114,7 @@ optionalCrateP = (Just <$> crateP) <|> emptyP where
    emptyP = count 3 spaceChar $> Nothing
 
 cratesP :: Parser [Maybe Crate]
-cratesP = optionalCrateP `sepBy` spaceChar
+cratesP = optionalCrateP `sepBy` char ' '
 
 allCratesP :: Parser [[Maybe Crate]]
 allCratesP = cratesP `sepEndBy` eol
