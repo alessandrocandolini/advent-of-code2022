@@ -117,10 +117,9 @@ cratesP :: Parser [Maybe Crate]
 cratesP = optionalCrateP `sepBy` spaceChar
 
 allCratesP :: Parser [[Maybe Crate]]
-allCratesP = cratesP `sepEndBy` eol <* eof
+allCratesP = cratesP `sepEndBy` eol
 
-parseCrates :: T.Text -> Maybe [[Maybe Crate]]
-parseCrates = rightToMaybe . parse allCratesP ""
+parseCrates = parse allCratesP ""
 
 parseCargo :: T.Text -> Maybe (Cargo Crate)
 parseCargo _ = Just $ Cargo $ M.empty
