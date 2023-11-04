@@ -4,7 +4,7 @@
 module Day5 where
 
 import qualified Data.IntMap as M
-import Data.Maybe (fromMaybe)
+import Data.Maybe ( fromMaybe, catMaybes )
 import Data.Semigroup
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
@@ -14,14 +14,16 @@ import Text.Megaparsec
 import Text.Megaparsec.Char
 import Data.Void
 import Data.Functor (($>))
+import Data.List (transpose)
 import Data.Either.Combinators (rightToMaybe)
 
 program :: FilePath -> IO ()
-program = (=<<) print . fmap (fmap (toAnswer . uncurry (flip logic)) . parseInput) . T.readFile where
-  toAnswer :: [Crate] -> Answer
-  toAnswer = Answer . fmap name
+program = (=<<) print . fmap run . T.readFile
 
-newtype Answer = Answer String deriving (Eq, Show)
+run :: T.Text -> Maybe Answer
+run = fmap ( Answer . fmap name . uncurry (flip logic)) . parseInput
+
+newtype Answer = Answer { answer1 :: String }  deriving (Eq, Show)
 
 logic :: [Instruction] -> Cargo a -> [a]
 logic inst = peeks . rearrangeAll (explodeAll inst)
@@ -40,6 +42,9 @@ peek = fmap fst . pop
 
 stackSize :: Stack a -> Int
 stackSize = getSum . foldMap (const 1)
+
+stackFromList :: [a] -> Stack a
+stackFromList = foldr push Empty
 
 newtype Crate = Crate {name :: Char} deriving (Eq, Show)
 
@@ -104,24 +109,26 @@ parseInput input = case T.splitOn "\n\n" input of
 parseInstructions :: T.Text -> [Instruction]
 parseInstructions = mapMaybe (parseInstruction . T.unpack) . T.lines
 
-type Parser a = Parsec Void T.Text a
+type Parser = Parsec Void T.Text
 
 crateP :: Parser Crate
 crateP = Crate <$> between (char '[') (char ']') letterChar
 
-optionalCrateP :: Parser (Maybe Crate)
-optionalCrateP = (Just <$> crateP) <|> emptyP where
-   emptyP = count 3 spaceChar $> Nothing
+maybeCrateP :: Parser (Maybe Crate)
+maybeCrateP = Just <$> crateP <|> emptyP where
+   emptyP = count 3 (char ' ') $> Nothing
 
 cratesP :: Parser [Maybe Crate]
-cratesP = optionalCrateP `sepBy` char ' '
+cratesP = optional (char ' ') *> many (maybeCrateP <* optional (char ' '))
 
 allCratesP :: Parser [[Maybe Crate]]
-allCratesP = cratesP `sepEndBy` eol
+allCratesP = some (cratesP <* newline)
 
-parseCrates = parse allCratesP ""
+parseCrates :: T.Text -> Either (ParseErrorBundle T.Text Void) (Cargo Crate)
+parseCrates = fmap postProcessing . parse allCratesP ""
+
+postProcessing :: [[Maybe Crate]] -> Cargo Crate
+postProcessing = Cargo . M.fromList . zip [1..] . fmap (stackFromList . catMaybes ) . transpose
 
 parseCargo :: T.Text -> Maybe (Cargo Crate)
-parseCargo _ = Just $ Cargo $ M.empty
-                      -- takeWhile (not . null) . iterate (drop 4) . tail .
-                      --fmap (dropWhile (== ' ') . trasponse . fmap T.unpack . init . T.lines
+parseCargo = rightToMaybe . parseCrates . T.unlines . init . T.lines
