@@ -6,7 +6,6 @@ module Day5Spec where
 
 import qualified Data.IntMap as M
 import Data.List (transpose, unfoldr)
-import Data.List.Split (splitOn)
 import Data.Maybe (isJust, isNothing)
 import Data.Semigroup
 import qualified Data.Text as T
