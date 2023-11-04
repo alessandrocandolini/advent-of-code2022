@@ -5,7 +5,6 @@ import qualified Data.Text as T
 import qualified Data.Text.IO as T
 import qualified Data.List.NonEmpty as N
 import Data.List.Split
-import Data.List.Index
 import Data.Text.Read (decimal)
 
 program :: FilePath -> IO ()
@@ -35,7 +34,7 @@ newtype Report = Report {
 
 bestCandidate = N.head . candidates
 
-parse =  N.nonEmpty . fmap parseElf . indexed . splitWhen T.null . T.lines  where
+parse =  N.nonEmpty . fmap parseElf . zip [0..] . splitWhen T.null . T.lines  where
    parseElf = Elf <$> (ElfName . (+ 1) . fst) <*> (fmap tRead . snd)
    tRead =  either (const 0) (Calories . fst) . decimal
 

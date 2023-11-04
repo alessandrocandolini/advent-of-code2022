@@ -4,21 +4,14 @@ version:             0.1.0.0
 dependencies:
 - base >= 4.7 && < 5
 - text
-- bytestring
 - containers
-- nonempty-containers
-- ilist
 - vector
 - split
 - safe
-- async
 - either
-- mtl
 - megaparsec
 - optparse-applicative
-- optparse-generic
 - witherable
-- MemoTrie
 - neat-interpolation
 
 default-extensions:
