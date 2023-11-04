@@ -10,6 +10,7 @@ import Data.List.Split (splitOn)
 import Data.Maybe (isJust, isNothing)
 import Data.Semigroup
 import qualified Data.Text as T
+import qualified Data.Text.IO as T
 import Day5
 import GHC.Exts (IsList (fromList, toList), Item)
 import NeatInterpolation
@@ -257,4 +258,12 @@ spec = describe "Day 5" $ do
         input = T.pack $ unlines ["     [D] ", " [N] [C] ", " [Z] [M] [P] ", " 1   2   3 ","\n", " move 1 from 2 to 1", " move 3 from 1 to 3"," move 2 from 2 to 1"," move 1 from 1 to 2"]
        in
         run input `shouldBe` Just (Answer "CMZ")
+
+  it "run on a extra small example" $ do
+    input <- T.readFile "resources/input5-extra-small"
+    run input `shouldBe` Just (Answer "TSDQMFCMM")
+
+  it "run on a small example" $ do
+    input <- T.readFile "resources/input5-small"
+    run input `shouldBe` Just (Answer "THDQMTCNM")
 

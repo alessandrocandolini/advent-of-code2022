@@ -90,7 +90,7 @@ rearrange (Move k1 k2) c = fromMaybe c $ do
   pure $ cargoPush k2 a c'
 
 rearrangeAll :: [Move] -> Cargo a -> Cargo a
-rearrangeAll = appEndo . foldMap (Endo . rearrange)
+rearrangeAll = appEndo . foldMap (Endo . rearrange) . reverse
 
 parseInstruction :: String -> Maybe Instruction
 parseInstruction input = case words input of
@@ -122,7 +122,7 @@ cratesP :: Parser [Maybe Crate]
 cratesP = optional (char ' ') *> many (maybeCrateP <* optional (char ' '))
 
 allCratesP :: Parser [[Maybe Crate]]
-allCratesP = some (cratesP <* newline)
+allCratesP = many (cratesP <* newline)
 
 parseCrates :: T.Text -> Either (ParseErrorBundle T.Text Void) (Cargo Crate)
 parseCrates = fmap postProcessing . parse allCratesP ""
