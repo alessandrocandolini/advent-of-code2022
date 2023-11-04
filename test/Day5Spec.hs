@@ -184,7 +184,6 @@ spec = describe "Day 5" $ do
        in
         parse crateP "" s `shouldBe` Right (Crate 'C')
 
-
   it "parse optional crates when they are all defined (and no spaces in between)"
     $ let
         s = "[C][D][E][F]"
@@ -223,7 +222,7 @@ spec = describe "Day 5" $ do
 
   it "parse optional crates from multiple lines"
     $ let
-        s = T.pack $ unlines ["    [D]    ","[N] [C]    ","[Z] [M] [P]"]
+        s = T.pack $ unlines ["    [D]    ", "[N] [C]    ", "[Z] [M] [P]"]
         expected :: [[Maybe Crate]]
         expected =
           [ [Nothing, Just (Crate 'D'), Nothing]
@@ -235,13 +234,15 @@ spec = describe "Day 5" $ do
 
   it "parse crates as maps from multiple lines"
     $ let
-        s = T.pack $ unlines ["    [D]    ","[N] [C]    ","[Z] [M] [P]"]
+        s = T.pack $ unlines ["    [D]    ", "[N] [C]    ", "[Z] [M] [P]"]
         expected :: Cargo Crate
-        expected = Cargo $ M.fromList
-          [ (1, [Crate 'N', Crate 'Z'])
-          , (2, [Crate 'D', Crate 'C', Crate 'M'])
-          , (3, [Crate 'P'])
-          ]
+        expected =
+          Cargo
+            $ M.fromList
+              [ (1, [Crate 'N', Crate 'Z'])
+              , (2, [Crate 'D', Crate 'C', Crate 'M'])
+              , (3, [Crate 'P'])
+              ]
        in
         parseCrates s `shouldBe` Right expected
 
@@ -249,13 +250,13 @@ spec = describe "Day 5" $ do
     $ let
         cargo = [(1, [Crate 'N', Crate 'Z']), (2, [Crate 'D', Crate 'C', Crate 'M']), (3, [Crate 'P'])]
         instructions = [Instruction 1 2 1, Instruction 3 1 3, Instruction 2 2 1, Instruction 1 1 2]
-        input = T.pack $ unlines ["     [D] ", " [N] [C] ", " [Z] [M] [P] ", " 1   2   3 ","\n", " move 1 from 2 to 1", " move 3 from 1 to 3"," move 2 from 2 to 1"," move 1 from 1 to 2"]
+        input = T.pack $ unlines ["     [D] ", " [N] [C] ", " [Z] [M] [P] ", " 1   2   3 ", "\n", " move 1 from 2 to 1", " move 3 from 1 to 3", " move 2 from 2 to 1", " move 1 from 1 to 2"]
        in
         parseInput input `shouldBe` Just (cargo, instructions)
 
   it "run"
     $ let
-        input = T.pack $ unlines ["     [D] ", " [N] [C] ", " [Z] [M] [P] ", " 1   2   3 ","\n", " move 1 from 2 to 1", " move 3 from 1 to 3"," move 2 from 2 to 1"," move 1 from 1 to 2"]
+        input = T.pack $ unlines ["     [D] ", " [N] [C] ", " [Z] [M] [P] ", " 1   2   3 ", "\n", " move 1 from 2 to 1", " move 3 from 1 to 3", " move 2 from 2 to 1", " move 1 from 1 to 2"]
        in
         run input `shouldBe` Just (Answer "CMZ")
 
@@ -266,4 +267,3 @@ spec = describe "Day 5" $ do
   it "run on a small example" $ do
     input <- T.readFile "resources/input5-small"
     run input `shouldBe` Just (Answer "THDQMTCNM")
-
