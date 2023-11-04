@@ -64,8 +64,15 @@ instance Arbitrary Crate where
    arbitrary = Crate <$> arbitrary
 
 instance Arbitrary a => Arbitrary (Cargo a) where
-   arbitrary = Cargo . M.fromList <$> listOf ((,) <$> choose (-20, 40) <*> arbitrary)
+   arbitrary = cargoFromList <$> listOf ((,) <$> choose (-20, 40) <*> arbitrary)
 
+-- we need a canonical representation for empty crane: either key present and stack empty or key not present at all
+cargoFromList :: [(Int, Stack a)] -> Cargo a
+cargoFromList = Cargo . M.filter isEmpty . M.fromList where
+      isEmpty Empty  = True
+      isEmpty (Day5.NonEmpty _ _ ) = False
+
+reverseMove :: Move -> Move
 reverseMove (Move k1 k2) = Move k2 k1
 
 cargoSize :: Cargo a -> Int
