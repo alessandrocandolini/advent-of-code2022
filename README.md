@@ -10,7 +10,9 @@ https://adventofcode.com/2022
 - Day 3: [problem](https://adventofcode.com/2022/day/3) | [solution](src/Day3.hs) | [test](test/Day3Spec.hs)
 - Day 4: [problem](https://adventofcode.com/2022/day/4) | [solution](src/Day4.hs) | [test](test/Day4Spec.hs) 
 - Day 5: [problem](https://adventofcode.com/2022/day/5) | [solution](src/Day5.hs) | [test](test/Day5Spec.hs) NOT READY YET
-- Day 6: TODO
+- Day 6: [problem](https://adventofcode.com/2022/day/6) | [solution](src/Day6.hs) | [test](test/Day6Spec.hs)
+- Day 7: [problem](https://adventofcode.com/2022/day/7) | [solution](src/Day7.hs) | [test](test/Day7Spec.hs) NOT READY YET
+- Day 8: TODO
 
 ## How to build and run locally
 
