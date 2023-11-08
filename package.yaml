@@ -13,6 +13,9 @@ dependencies:
 - optparse-applicative
 - witherable
 - neat-interpolation
+- recursion-schemes
+- data-fix
+- pretty
 
 default-extensions:
 - OverloadedStrings
