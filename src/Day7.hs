@@ -60,7 +60,7 @@ duDir = undefined
 
 pretty :: FileSystemF Doc -> Doc
 pretty (FileF (FileName name) (Size size)) = P.text name <> P.space <> P.int size
-pretty (DirectoryF _ docs) = P.cat docs
+pretty (DirectoryF (DirectoryName name) docs) = P.vcat ([P.text name] <> docs)
 
 display :: FileSystem -> String
 display = P.render . cata pretty
