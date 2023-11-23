@@ -7,6 +7,7 @@ import NeatInterpolation
 import Test.Hspec
 import Test.Hspec.QuickCheck
 import Test.QuickCheck.Property
+import qualified Data.List.NonEmpty as N
 
 spec :: Spec
 spec = describe "Day 9" $ do
@@ -25,7 +26,7 @@ spec = describe "Day 9" $ do
                ]
 
   it "evolveRope"
-    $ (fmap ropeTail . evolveRope initialRope . explodeAll)
+    $ (fmap (N.last . knots) . evolveRope part1 . explodeAll)
       [ Instruction RightWard 4
       , Instruction Up 4
       , Instruction LeftWard 3
@@ -35,29 +36,29 @@ spec = describe "Day 9" $ do
       , Instruction LeftWard 5
       , Instruction RightWard 2
       ]
-    `shouldBe` [ Position 0 0
-               , Position 0 0
-               , Position 1 0
-               , Position 2 0
-               , Position 3 0
-               , Position 3 0
-               , Position 4 1
-               , Position 4 2
-               , Position 4 3
-               , Position 4 3
-               , Position 3 4
-               , Position 2 4
-               , Position 2 4
-               , Position 2 4
-               , Position 2 4
-               , Position 3 3
-               , Position 4 3
-               , Position 4 3
-               , Position 4 3
-               , Position 4 3
-               , Position 3 2
-               , Position 2 2
-               , Position 1 2
-               , Position 1 2
-               , Position 1 2
+    `shouldBe` [ Knot 0 0
+               , Knot 0 0
+               , Knot 1 0
+               , Knot 2 0
+               , Knot 3 0
+               , Knot 3 0
+               , Knot 4 1
+               , Knot 4 2
+               , Knot 4 3
+               , Knot 4 3
+               , Knot 3 4
+               , Knot 2 4
+               , Knot 2 4
+               , Knot 2 4
+               , Knot 2 4
+               , Knot 3 3
+               , Knot 4 3
+               , Knot 4 3
+               , Knot 4 3
+               , Knot 4 3
+               , Knot 3 2
+               , Knot 2 2
+               , Knot 1 2
+               , Knot 1 2
+               , Knot 1 2
                ]
