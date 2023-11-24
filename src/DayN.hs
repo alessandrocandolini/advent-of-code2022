@@ -7,5 +7,7 @@ program = (=<<) print . fmap logic . T.readFile
 
 data Answer = Answer deriving (Eq, Show)
 
+data Instructions = Instructions deriving (Eq, Show)
+
 logic :: T.Text -> Answer
 logic = const Answer

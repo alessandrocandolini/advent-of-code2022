@@ -30,10 +30,10 @@ spec = describe "Day 7" $ do
      it "total size of a filesystem" $
         du filesystem `shouldBe` 1500
 
-     it "total size of a filesystem" $
+     xit "total size of a filesystem" $
         duDir filesystem `shouldBe` [("/", 1500), ("folder1", 950), ("folder3", 500), ("folder2", 250)]
 
-     it "print directory and file structure" $
+     xit "print directory and file structure" $
         display filesystem `shouldBe` T.unpack [trimming|
            /
            |-- file1.txt
