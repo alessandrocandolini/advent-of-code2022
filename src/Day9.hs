@@ -37,7 +37,10 @@ rope2 :: Rope
 rope2 = generateRope 10
 
 generateRope :: Int -> Rope
-generateRope n = Rope (knot N.:| replicate (n - 1) knot)
+generateRope = Rope . replicateNonEmpty knot
+ where
+  replicateNonEmpty :: a -> Int -> NonEmpty a
+  replicateNonEmpty a n = a N.:| replicate (n - 1) a
 
 knot :: Knot
 knot = Knot 0 0
