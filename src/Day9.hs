@@ -7,8 +7,8 @@ import Data.List.NonEmpty (NonEmpty)
 import qualified Data.List.NonEmpty as N
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
-import Data.Void
-import Text.Megaparsec
+import Data.Void ( Void )
+import Text.Megaparsec ( (<|>), parse, Parsec, ParseErrorBundle )
 import Text.Megaparsec.Char (char)
 import Text.Megaparsec.Char.Lexer (decimal)
 
