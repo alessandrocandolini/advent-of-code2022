@@ -19,6 +19,9 @@ moveTwoKnots (knotH, knotT) direction = (knotH', knotT') where
 instance Arbitrary Direction where
   arbitrary = elements [Up, Down, LeftWard, RightWard]
 
+instance Arbitrary Knot where
+  arbitrary = Knot <$> choose (0, 100) <*> choose (0, 100)
+
 instructions = [ Instruction RightWard 4
       , Instruction Up 4
       , Instruction LeftWard 3
@@ -55,10 +58,15 @@ spec = describe "Day 9" $ do
      in
       fmap (N.last . knots) ropeHistory == fmap snd twoKnotsHistory
 
+  prop "moveTowards behaves as the identity function for knots nearby" $
+   \knot direction -> let
+     knot' = move direction knot
+    in
+     moveTowards knot knot' == knot'
 
 
   it "evolveRope with just two knows (part1)"
-    $ (fmap (N.last . knots) . evolveRope part1 . explodeAll) instructions
+    $ (fmap (N.last . knots) . evolveRope rope1 . explodeInstructions) instructions
           `shouldBe` [ Knot 0 0
                , Knot 0 0
                , Knot 1 0
@@ -87,8 +95,8 @@ spec = describe "Day 9" $ do
                ]
 
   it "solve example"
-    $ (solve part1 . explodeAll) instructions `shouldBe` 13
+    $ (solve rope1 . explodeInstructions) instructions `shouldBe` 13
 
   it "solve the puzzle" $ do
     input <- T.readFile "resources/input9"
-    logic input `shouldBe` Answer 6376 6376
+    logic input `shouldBe` Answer 6376 2607

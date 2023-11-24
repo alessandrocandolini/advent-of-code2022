@@ -15,17 +15,28 @@ import Text.Megaparsec.Char.Lexer (decimal)
 program :: FilePath -> IO ()
 program = (=<<) print . fmap logic . T.readFile
 
-data Answer = Answer Int Int deriving (Eq, Show)
+data Answer = Answer
+  { solution1 :: Int
+  , solution2 :: Int
+  }
+  deriving (Eq, Show)
 
 logic :: T.Text -> Answer
-logic = (Answer <$> solve part1 <*> solve part2) . explodeAll . parseInstruction
+logic = (Answer <$> solve rope1 <*> solve rope2) . explodeInstructions . parseInstruction
 
-solve i = length . nub . fmap (N.last . knots) . evolveRope i
+solve :: Rope -> [Direction] -> Int
+solve initialRope = length . nub . fmap (N.last . knots) . evolveRope initialRope
 
-part1 = rope 2
-part2 = rope 10
-rope n = Rope $ initial N.:| (replicate (n - 1) initial)
+rope1 :: Rope
+rope1 = generateRope 2
 
+rope2 :: Rope
+rope2 = generateRope 10
+
+generateRope :: Int -> Rope
+generateRope n = Rope (initial N.:| replicate (n - 1) initial)
+
+initial :: Knot
 initial = Knot 0 0
 
 newtype Rope = Rope
@@ -68,11 +79,11 @@ evolveRope = scanl moveRope
 
 data Instruction = Instruction Direction Int deriving (Eq, Show)
 
-explode :: Instruction -> [Direction]
-explode (Instruction direction times) = replicate times direction
+explodeInstruction :: Instruction -> [Direction]
+explodeInstruction (Instruction direction times) = replicate times direction
 
-explodeAll :: [Instruction] -> [Direction]
-explodeAll = (=<<) explode
+explodeInstructions :: [Instruction] -> [Direction]
+explodeInstructions = (=<<) explodeInstruction
 
 type Parser = Parsec Void T.Text
 
