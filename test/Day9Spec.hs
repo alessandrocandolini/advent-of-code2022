@@ -36,7 +36,7 @@ instructions = [ Instruction RightWard 4
 spec :: Spec
 spec = describe "Day 9" $ do
   it "parse instruction"
-    $ parseInstruction
+    $ parseInstructions
       [trimming|
           L 1
           U 3
@@ -51,9 +51,9 @@ spec = describe "Day 9" $ do
 
   prop "model check: evolveRope for two knots is the same as evolving the two knows manually" $
    \directions -> let
-      rope = Rope (initial N.:| [initial])
+      rope = Rope (knot N.:| [knot])
       ropeHistory = evolveRope rope directions
-      twoKnots = (initial, initial)
+      twoKnots = (knot, knot)
       twoKnotsHistory = scanl moveTwoKnots twoKnots directions
      in
       fmap (N.last . knots) ropeHistory == fmap snd twoKnotsHistory

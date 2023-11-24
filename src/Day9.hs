@@ -22,10 +22,13 @@ data Answer = Answer
   deriving (Eq, Show)
 
 logic :: T.Text -> Answer
-logic = (Answer <$> solve rope1 <*> solve rope2) . explodeInstructions . parseInstruction
+logic = (Answer <$> solve rope1 <*> solve rope2) . explodeInstructions . parseInstructions
 
 solve :: Rope -> [Direction] -> Int
-solve initialRope = length . nub . fmap (N.last . knots) . evolveRope initialRope
+solve initialRope = length . nub . fmap lastKnot . evolveRope initialRope
+ where
+  lastKnot :: Rope -> Knot
+  lastKnot = N.last . knots
 
 rope1 :: Rope
 rope1 = generateRope 2
@@ -34,10 +37,10 @@ rope2 :: Rope
 rope2 = generateRope 10
 
 generateRope :: Int -> Rope
-generateRope n = Rope (initial N.:| replicate (n - 1) initial)
+generateRope n = Rope (knot N.:| replicate (n - 1) knot)
 
-initial :: Knot
-initial = Knot 0 0
+knot :: Knot
+knot = Knot 0 0
 
 newtype Rope = Rope
   { knots :: NonEmpty Knot
@@ -101,5 +104,8 @@ directionP =
 instructionP :: Parser Instruction
 instructionP = Instruction <$> (directionP <* char ' ') <*> decimal
 
-parseInstruction :: T.Text -> [Instruction]
-parseInstruction = fromRight [] . traverse (parse instructionP "") . T.lines
+parseInstruction :: T.Text -> Either (ParseErrorBundle T.Text Void) Instruction
+parseInstruction = parse instructionP ""
+
+parseInstructions :: T.Text -> [Instruction]
+parseInstructions = fromRight [] . traverse parseInstruction . T.lines
