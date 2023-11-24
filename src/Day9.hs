@@ -24,9 +24,9 @@ solve i = length . nub . fmap (N.last . knots) . evolveRope i
 
 part1 = rope 2
 part2 = rope 10
-rope n = Rope $ initial N.:| replicate (n - 1) initial
- where
-  initial = Knot 0 0
+rope n = Rope $ initial N.:| (replicate (n - 1) initial)
+
+initial = Knot 0 0
 
 newtype Rope = Rope
   { knots :: NonEmpty Knot
@@ -54,7 +54,7 @@ proximity target current
   | otherwise = Distant
 
 moveTowards :: Knot -> Knot -> Knot
-moveTowards target current | proximity target current == Close = target
+moveTowards target current | proximity target current == Close = current
 moveTowards (Knot xH yH) (Knot xT yT) = Knot (xT + signum (xH - xT)) (yT + signum (yH - yT))
 
 moveRope :: Rope -> Direction -> Rope

@@ -6,8 +6,29 @@ import Day9
 import NeatInterpolation
 import Test.Hspec
 import Test.Hspec.QuickCheck
-import Test.QuickCheck.Property
+import Test.QuickCheck
 import qualified Data.List.NonEmpty as N
+import qualified Data.Text as T
+import qualified Data.Text.IO as T
+
+moveTwoKnots :: (Knot, Knot) -> Direction -> (Knot, Knot)
+moveTwoKnots (knotH, knotT) direction = (knotH', knotT') where
+        knotH' = move direction knotH
+        knotT' = moveTowards knotH' knotT
+
+instance Arbitrary Direction where
+  arbitrary = elements [Up, Down, LeftWard, RightWard]
+
+instructions = [ Instruction RightWard 4
+      , Instruction Up 4
+      , Instruction LeftWard 3
+      , Instruction Down 1
+      , Instruction RightWard 4
+      , Instruction Down 1
+      , Instruction LeftWard 5
+      , Instruction RightWard 2
+      ]
+
 
 spec :: Spec
 spec = describe "Day 9" $ do
@@ -25,18 +46,20 @@ spec = describe "Day 9" $ do
                , Instruction Down 2
                ]
 
-  it "evolveRope"
-    $ (fmap (N.last . knots) . evolveRope part1 . explodeAll)
-      [ Instruction RightWard 4
-      , Instruction Up 4
-      , Instruction LeftWard 3
-      , Instruction Down 1
-      , Instruction RightWard 4
-      , Instruction Down 1
-      , Instruction LeftWard 5
-      , Instruction RightWard 2
-      ]
-    `shouldBe` [ Knot 0 0
+  prop "model check: evolveRope for two knots is the same as evolving the two knows manually" $
+   \directions -> let
+      rope = Rope (initial N.:| [initial])
+      ropeHistory = evolveRope rope directions
+      twoKnots = (initial, initial)
+      twoKnotsHistory = scanl moveTwoKnots twoKnots directions
+     in
+      fmap (N.last . knots) ropeHistory == fmap snd twoKnotsHistory
+
+
+
+  it "evolveRope with just two knows (part1)"
+    $ (fmap (N.last . knots) . evolveRope part1 . explodeAll) instructions
+          `shouldBe` [ Knot 0 0
                , Knot 0 0
                , Knot 1 0
                , Knot 2 0
@@ -62,3 +85,10 @@ spec = describe "Day 9" $ do
                , Knot 1 2
                , Knot 1 2
                ]
+
+  it "solve example"
+    $ (solve part1 . explodeAll) instructions `shouldBe` 13
+
+  it "solve the puzzle" $ do
+    input <- T.readFile "resources/input9"
+    logic input `shouldBe` Answer 6376 6376
