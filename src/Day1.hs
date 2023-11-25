@@ -6,6 +6,8 @@ import qualified Data.Text.IO as T
 import qualified Data.List.NonEmpty as N
 import Data.List.Split
 import Data.Text.Read (decimal)
+import Data.Semigroup
+import Data.Foldable
 
 program :: FilePath -> IO ()
 program = (=<<) T.putStrLn
@@ -19,6 +21,7 @@ newtype ElfName = ElfName Int
 
 newtype Calories = Calories Int
    deriving (Eq, Num, Ord, Read, Show) via Int
+   deriving (Semigroup, Monoid) via (Sum Int)
 
 data Elf = Elf {
    name :: ElfName,
@@ -26,7 +29,7 @@ data Elf = Elf {
    } deriving (Eq,Show)
 
 
-totalCalories = sum . calories
+totalCalories = fold . calories
 
 newtype Report = Report {
     candidates :: N.NonEmpty Elf
@@ -40,7 +43,7 @@ parse =  N.nonEmpty . fmap parseElf . zip [0..] . splitWhen T.null . T.lines  wh
 
 logic = Report . ((N.:|) <$> N.head <*> (take 2 . N.tail))  . N.reverse . N.sortWith totalCalories
 
-allCalories = sum . concatMap calories
+allCalories = fold . foldMap calories
 
 printResultsFromReport = T.pack . (printResults <$> name . bestCandidate <*> totalCalories . bestCandidate <*> allCalories . candidates ) where
      printResults n t a = "Winner: " ++ show n ++ "\nTotal calories: " ++ show t ++ "\nTotal candidates first 3 candidates: " ++ show a
