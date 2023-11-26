@@ -110,8 +110,8 @@ directionP =
 instructionP :: Parser Instruction
 instructionP = Instruction <$> (directionP <* space) <*> decimal
 
+instructionsP :: Parser [Instruction]
+instructionsP = instructionP `sepEndBy1` newline
+
 parseInstructions :: T.Text -> Either ParserError [Instruction]
-parseInstructions = parse linesP ""
- where
-  linesP :: Parser [Instruction]
-  linesP = instructionP `sepEndBy1` newline
+parseInstructions = parse instructionsP ""
