@@ -33,13 +33,13 @@ solve initialRope = length . nub . fmap lastKnot . evolveRope initialRope
   lastKnot = N.last . knots
 
 rope1 :: Rope
-rope1 = generateRope 2
+rope1 = ropeWithNKnots 2
 
 rope2 :: Rope
-rope2 = generateRope 10
+rope2 = ropeWithNKnots 10
 
-generateRope :: Int -> Rope
-generateRope = Rope . replicateNonEmpty knot
+ropeWithNKnots:: Int -> Rope
+ropeWithNKnots = Rope . replicateNonEmpty knot
  where
   replicateNonEmpty :: a -> Int -> NonEmpty a
   replicateNonEmpty a n = a N.:| replicate (n - 1) a
