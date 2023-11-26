@@ -7,9 +7,9 @@ import Data.List.NonEmpty (NonEmpty)
 import qualified Data.List.NonEmpty as N
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
-import Data.Void ( Void )
-import Text.Megaparsec ( (<|>), parse, Parsec, ParseErrorBundle )
-import Text.Megaparsec.Char (char)
+import Data.Void (Void)
+import Text.Megaparsec (ParseErrorBundle, Parsec, parse, sepEndBy1, (<|>))
+import Text.Megaparsec.Char (char, newline, space)
 import Text.Megaparsec.Char.Lexer (decimal)
 
 program :: FilePath -> IO ()
@@ -22,7 +22,9 @@ data Answer = Answer
   deriving (Eq, Show)
 
 logic :: T.Text -> Answer
-logic = (Answer <$> solve rope1 <*> solve rope2) . explodeInstructions . parseInstructions
+logic = (Answer <$> solve rope1 <*> solve rope2) . explodeInstructions . ignoreParsingErrors . parseInstructions
+ where
+  ignoreParsingErrors = fromRight []
 
 solve :: Rope -> [Direction] -> Int
 solve initialRope = length . nub . fmap lastKnot . evolveRope initialRope
@@ -92,6 +94,7 @@ explodeInstructions :: [Instruction] -> [Direction]
 explodeInstructions = (=<<) explodeInstruction
 
 type Parser = Parsec Void T.Text
+type ParserError = ParseErrorBundle T.Text Void
 
 directionP :: Parser Direction
 directionP =
@@ -105,10 +108,10 @@ directionP =
     $> Down
 
 instructionP :: Parser Instruction
-instructionP = Instruction <$> (directionP <* char ' ') <*> decimal
+instructionP = Instruction <$> (directionP <* space) <*> decimal
 
-parseInstruction :: T.Text -> Either (ParseErrorBundle T.Text Void) Instruction
-parseInstruction = parse instructionP ""
-
-parseInstructions :: T.Text -> [Instruction]
-parseInstructions = fromRight [] . traverse parseInstruction . T.lines
+parseInstructions :: T.Text -> Either ParserError [Instruction]
+parseInstructions = parse linesP ""
+ where
+  linesP :: Parser [Instruction]
+  linesP = instructionP `sepEndBy1` newline
